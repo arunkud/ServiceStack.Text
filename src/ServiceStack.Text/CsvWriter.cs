@@ -114,7 +114,10 @@ namespace ServiceStack.Text
 
 		public static void WriteObjectRow(TextWriter writer, object record)
 		{
-			WriteRow(writer, (T)record);
+			if(typeof(T).IsValueType)
+				WriteRow (writer, null);
+			else
+				WriteRow(writer, (T)record); 
 		}
 
 		public static void Write(TextWriter writer, IEnumerable<T> records)
@@ -175,6 +178,8 @@ namespace ServiceStack.Text
 
 		public static void WriteRow(TextWriter writer, IEnumerable<string> row)
 		{
+			if (row == null) return; //AOT
+
 			var ranOnce = false;
 			foreach (var field in row)
 			{

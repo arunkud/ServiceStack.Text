@@ -213,19 +213,29 @@ namespace ServiceStack.Text
 			bool ret = false;
 			try
 			{
-				JsonAotConfig.Register<T>();
-
 				int i = 0;
 				if(JsvWriter<T>.WriteFn() != null && JsvReader<T>.GetParseFn() != null) i++;
+				if(JsvWriter.GetWriteFn(typeof(T)) != null && JsvReader.GetParseFn(typeof(T)) != null) i++;
+				//if(JsvTypeSerializer.Instance.GetWriteFn<T>() != null && JsvTypeSerializer.Instance.GetParseFn<T>() != null) i++;
+				//if(JsvTypeSerializer.Instance.GetWriteFn(typeof(T)) != null && JsvTypeSerializer.Instance.GetParseFn(typeof(T)) != null) i++;
 				if(JsonWriter<T>.WriteFn() != null && JsonReader<T>.GetParseFn() != null) i++;
-				if(QueryStringWriter<Poco>.WriteFn() != null) i++;
+				if(JsonWriter.GetWriteFn(typeof(T)) != null && JsonReader.GetParseFn(typeof(T)) != null) i++;
+				//if(JsonTypeSerializer.Instance.GetWriteFn<T>() != null && JsonTypeSerializer.Instance.GetParseFn<T>() != null) i++;
+				//if(JsonTypeSerializer.Instance.GetWriteFn(typeof(T)) != null && JsonTypeSerializer.Instance.GetParseFn(typeof(T)) != null) i++;
+				if(QueryStringWriter<T>.WriteFn() != null) i++;
 
 				CsvSerializer<T>.WriteFn();
 	            CsvSerializer<T>.WriteObject(null, null);
 	            CsvWriter<T>.WriteObject(null, null);
 	            CsvWriter<T>.WriteObjectRow(null, null);
+
+				if(!typeof(T).IsValueType)
+					JsonAotConfig.Register<T>();
+
 				ret = true;
-			}catch(Exception){}
+			}catch(Exception e){
+				System.Diagnostics.Debug.WriteLine(e.Message);
+			}
 
 			return ret;
 		}
